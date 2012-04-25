@@ -1,6 +1,7 @@
 # Patella
 
-TODO: Write a gem description
+Gem for the RailsConf 2012 talk Patella: It's Memoization into Memcached calculated in the background with Resque.
+[www.slideshare.net/jdwyah/patella-railsconf-2012](http://www.slideshare.net/jdwyah/patella-railsconf-2012)
 
 ## Installation
 
@@ -18,7 +19,14 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+  def self.my_slow_method(user_id)
+    all_notifications_for(User.find(user_id))
+  end
+  patella_reflex :notification_unread_count, :expires_in => 3.minutes, :class_method => true
+```
+
+See the tests for more [examples](https://github.com/kbrock/patella/blob/master/test/patella_test.rb)
 
 ## Contributing
 
