@@ -8,6 +8,7 @@ require 'active_support'
 require 'active_support/test_case'
 require 'json'
 require 'mocha'
+require 'bourne'
 
 unless defined?(Rails)
 module Rails

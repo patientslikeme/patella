@@ -50,10 +50,10 @@ class PatellaTest < ActiveSupport::TestCase
 
     #background
     with_caching do
-      SendLaterWorker.stubs :perform_later => 'loading'
+      Patella::SendLaterWorker.stubs :perform_later => 'loading'
       f1 = Dummy.new 5
       assert f1.foo.loading?
-      assert_received(SendLaterWorker, :perform_later) do |ex|
+      assert_received(Patella::SendLaterWorker, :perform_later) do |ex|
         ex.once
         ex.with 'Dummy', f1.id, :caching_foo, []
       end
@@ -63,7 +63,7 @@ class PatellaTest < ActiveSupport::TestCase
   def test_turning_off_background
     #background
     with_caching do
-      SendLaterWorker.expects(:perform_later).never
+      Patella::SendLaterWorker.expects(:perform_later).never
       Dummy.any_instance.expects('caching_no_background_add').once.returns(9)
       d = Dummy.new(1)
       result = d.no_background_add(4,5)
@@ -134,7 +134,7 @@ private
   def with_caching(&block)
     #previous_caching = ActionController::Base.perform_caching
     begin
-      Rails.cache.stubs(:caching? => true)
+      Rails.stubs(:caching? => true)
       #ActionController::Base.perform_caching = true
       yield
     ensure
