@@ -4,5 +4,5 @@ require "patella/send_later"
 require "patella/send_later_worker"
 
 module Patella
-  # Your code goes here...
+  ActiveRecord::Base.send :include, ::Patella::SendLater
 end

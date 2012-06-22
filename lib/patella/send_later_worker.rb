@@ -1,9 +1,17 @@
 module Patella
   class SendLaterWorker
-    @queue = :send_later
+    extend ::Resque::Plugins::Meta
+    @@default_queue = :send_later
+    @@queues = {}
 
-    def self.perform_later *args
-      self.enqueue *args
+    def self.perform_later(*args)
+      # args[0] is class name of invoking class, args[2] is method
+      queue = self.queue_for(args[0], args[2])
+      Resque::Job.create(queue, 'Patella::SendLaterWorker', *args)
+    end
+
+    def self.queue_for(class_name, method_name)
+      @@queues[class_name].try(:[],method_name) || @@default_queue
     end
 
     def self.perform(class_name, instance_id, method_name, *args)
