@@ -23,7 +23,7 @@ Or install it yourself as:
   def self.my_slow_method(user_id)
     all_notifications_for(User.find(user_id))
   end
-  patella_reflex :notification_unread_count, :expires_in => 3.minutes, :class_method => true
+  patella_reflex :my_slow_method, :expires_in => 3.minutes, :class_method => true
 ```
 
 See the tests for more [examples](https://github.com/kbrock/patella/blob/master/test/patella_test.rb)
