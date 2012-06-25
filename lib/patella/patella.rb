@@ -15,9 +15,13 @@ module Patella::Patella
 
 
   def self.from_key(cache_key)
-    val = JSON.parse(Rails.cache.read(cache_key))
-
-    PatellaResult.new(val['result'], val['promise'], cache_key)
+    val = Rails.cache.read(cache_key)
+    if val.blank?
+      PatellaResult.new({}, true, cache_key)
+    else
+      val = JSON.parse(val) unless val.blank?
+      PatellaResult.new(val['result'], val['promise'], cache_key)
+    end
   end
 
   module ClassMethods
