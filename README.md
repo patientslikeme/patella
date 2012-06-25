@@ -28,6 +28,36 @@ Or install it yourself as:
 
 See the tests for more [examples](https://github.com/kbrock/patella/blob/master/test/patella_test.rb)
 
+Inlcude the partial:
+```ruby
+  module ApplicationHelper
+    include Patella::PatellaPartial
+  end
+```
+
+Add a controller:
+```ruby
+  class PatellaController < ApplicationController
+    include Patella::Actions
+    helper :some_app_helper_i_need
+end
+```
+
+Then in your view:
+
+```haml
+= patella_partial @some_patella_obj, 'path/to/my/partial', :extra_things => :to_render_partial
+```
+
+And in the partial:
+
+```haml
+
+- your_patella_result = patella_obj
+- lookup = User.find(extra_things)
+
+```
+
 ## Contributing
 
 1. Fork it

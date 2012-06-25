@@ -13,12 +13,19 @@ module Patella::Patella
     "patella/#{self.class.to_s}/#{id_param}/#{symbol}/#{Digest::MD5.hexdigest(args.to_json)}"
   end
 
+
+  def self.from_key(cache_key)
+    val = JSON.parse(Rails.cache.read(cache_key))
+
+    PatellaResult.new(val['result'], val['promise'], cache_key)
+  end
+
   module ClassMethods
     def patella_key(symbol, args)
       "patella/#{self.to_s}//#{symbol}/#{Digest::MD5.hexdigest(args.to_json)}"
     end
 
-    def patella_reflex(symbol, options = {})      
+    def patella_reflex(symbol, options = {})
       options[:expires_in] ||= 30*60
       options[:soft_expiration] ||= 0
       options[:no_backgrounding] ||= false
@@ -48,7 +55,7 @@ module Patella::Patella
 
         def #{symbol}(*args)
           patella_#{symbol}(args, {:no_backgrounding => #{options[:no_backgrounding]}})
-        end 
+        end
 
         def patella_#{symbol}(args, opts)
           cache_key = self.patella_key('#{symbol}',args)
