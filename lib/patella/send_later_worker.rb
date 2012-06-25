@@ -2,6 +2,7 @@ module Patella
   class SendLaterWorker
     extend ::Resque::Plugins::Meta
     @@default_queue = :send_later
+    cattr_accessor :queues
     @@queues = {}
 
     def self.perform_later(*args)
@@ -11,7 +12,7 @@ module Patella
     end
 
     def self.queue_for(class_name, method_name)
-      @@queues[class_name].try(:[],method_name) || @@default_queue
+      @@queues[class_name.to_s].try(:[],method_name.to_s) || @@default_queue
     end
 
     def self.perform(class_name, instance_id, method_name, *args)
