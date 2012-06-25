@@ -89,7 +89,7 @@ module Patella::Patella
             self.send_later(:caching_#{symbol}, args)
           end
 
-          PatellaResult.new val, loading
+          PatellaResult.new val, loading, cache_key
         end
 
         if private_method_defined?(#{original_method.inspect})                   # if private_method_defined?(:_unmemoized_mime_type)
@@ -109,10 +109,11 @@ module Patella::Patella
 end
 
 class PatellaResult < ActiveSupport::BasicObject
-
-  def initialize(target=nil, loading=false)
+  attr_reader :cache_key
+  def initialize(target=nil, loading=false, cache_key)
     @target = target
     @loading = loading
+    @cache_key = cache_key
   end
 
   def loading?
