@@ -1,4 +1,6 @@
 module Patella::PatellaPartial
+  @@valid_templates = Set.new
+
   def patella_partial patella_obj, partial, params = {}
     if patella_obj.loaded?
       render :partial => partial, :locals => params.merge(:patella_obj => patella_obj)
@@ -34,5 +36,8 @@ module Patella::PatellaPartial
        </div>
        ".html_safe!
     end
+  end
+
+  def javascript
   end
 end
