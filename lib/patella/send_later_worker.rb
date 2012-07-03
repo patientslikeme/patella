@@ -1,3 +1,6 @@
+require 'resque'
+require 'resque/plugins/meta'
+
 module Patella
   class SendLaterWorker
     extend ::Resque::Plugins::Meta
