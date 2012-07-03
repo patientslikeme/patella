@@ -1,0 +1,5 @@
+:tddium:
+  :ruby_version: ruby-1.9.3-p194
+  :test_pattern:
+    - test/*_test.rb
+    - test/**/*_test.rb
