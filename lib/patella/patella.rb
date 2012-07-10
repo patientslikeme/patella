@@ -30,7 +30,7 @@ module Patella::Patella
     end
 
     def patella_reflex(symbol, options = {})
-      options[:expires_in] ||= 60*60*24*365*10
+      options[:expires_in] ||= 60*60*24*29
       options[:soft_expiration] ||= 0
       options[:no_backgrounding] ||= false
       is_class = options[:class_method]
