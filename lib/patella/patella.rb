@@ -65,13 +65,13 @@ module Patella::Patella
           cache_key = self.patella_key('#{symbol}',args)
           promise = { 'promise' => true }
 
-          json = Rails.cache.fetch(cache_key, :expires_in => #{options[:expires_in]}, :force => !Rails.caching?) do
+          json = Rails.cache.fetch(cache_key, :expires_in => #{options[:expires_in]}, :force => ::Patella::SendLater.send_now) do
             if opts[:no_backgrounding]
               promise['result'] = self.send(:caching_#{symbol}, args)
               promise.delete('promise')
             else
               promise['result'] = self.send_later(:caching_#{symbol}, args)   #send_later sends_later when Rails.caching? otherwise sends_now
-              promise.delete('promise') unless Rails.caching?
+              promise.delete('promise') if ::Patella::SendLater.send_now
             end
             promise.to_json
           end

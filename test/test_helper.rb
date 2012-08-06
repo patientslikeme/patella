@@ -1,16 +1,6 @@
 require 'rubygems'
 require 'bundler/setup'
 
-Bundler.require
-require 'patella'
-require 'test/unit'
-require 'active_support'
-require 'active_support/test_case'
-require 'json'
-require 'mocha'
-require 'bourne'
-
-unless defined?(Rails)
 module Rails
   class MockCache
     def fetch(*args)
@@ -20,15 +10,22 @@ module Rails
     end
   end
 
-  def self.caching=(value)
-    @caching=value
-  end
-
-  def self.caching?
-    @caching
-  end
   def self.cache
     @cache ||= MockCache.new
   end
+
+  def self.env
+    'test'
+  end
 end
-end
+
+Bundler.require
+require 'patella'
+require 'test/unit'
+require 'active_support'
+require 'active_support/test_case'
+require 'json'
+require 'mocha'
+require 'bourne'
+
+

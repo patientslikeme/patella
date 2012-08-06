@@ -49,7 +49,7 @@ class PatellaTest < ActiveSupport::TestCase
     assert_received(f, :caching_foo)
 
     #background
-    with_caching do
+    sending_later do
       Patella::SendLaterWorker.stubs :perform_later => 'loading'
       f1 = Dummy.new 5
       assert f1.foo.loading?
@@ -62,7 +62,7 @@ class PatellaTest < ActiveSupport::TestCase
 
   def test_turning_off_background
     #background
-    with_caching do
+    sending_later do
       Patella::SendLaterWorker.expects(:perform_later).never
       Dummy.any_instance.expects('caching_no_background_add').once.returns(9)
       d = Dummy.new(1)
@@ -78,7 +78,7 @@ class PatellaTest < ActiveSupport::TestCase
     assert result.loaded?
     assert_equal 9, result
 
-    with_caching do
+    sending_later do
       result = d.bar(4,5)  #still here
       assert result.loaded?
       assert_equal 9, result
@@ -131,14 +131,13 @@ private
     Digest::MD5.hexdigest(str)
   end
 
-  def with_caching(&block)
-    #previous_caching = ActionController::Base.perform_caching
+  def sending_later(&block)
+    previous_send_now = Patella::SendLater.send_now
     begin
-      Rails.stubs(:caching? => true)
-      #ActionController::Base.perform_caching = true
+      Patella::SendLater.send_now = false
       yield
     ensure
-      #ActionController::Base.perform_caching = previous_caching
+      Patella::SendLater.send_now = previous_send_now
     end
   end
 end

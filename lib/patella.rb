@@ -7,7 +7,7 @@ require "patella/controllers/actions"
 require 'activerecord'
 
 module Patella
-  ::Patella::SendLater.send_now = case Rails.env.try(:to_s)
+  ::Patella::SendLater.send_now = case ::Rails.env.try(:to_s)
   when 'development', 'test'
     true
   else
