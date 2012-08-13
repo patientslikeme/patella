@@ -4,7 +4,7 @@ require "patella/send_later"
 require "patella/send_later_worker"
 require "patella/helpers/patella_partial"
 require "patella/controllers/actions"
-require 'activerecord'
+require "active_record"
 
 module Patella
   ::Patella::SendLater.send_now = case ::Rails.env.try(:to_s)
