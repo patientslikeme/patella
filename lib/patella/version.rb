@@ -1,3 +1,3 @@
 module Patella
-  VERSION = "0.0.4" unless defined?(Patella::VERSION)
+  VERSION = "0.1.0" unless defined?(Patella::VERSION)
 end

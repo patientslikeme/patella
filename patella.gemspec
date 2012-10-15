@@ -16,8 +16,8 @@ Gem::Specification.new do |gem|
   gem.version       = Patella::VERSION
   gem.add_dependency 'resque', '~>1.16'
   gem.add_dependency 'resque-meta', '~>1.0.0'
-  gem.add_dependency 'activesupport', '~>2.3' #, :require => 'active_support'
-  gem.add_dependency 'rails', '~>2.3' #, :require => 'active_support'
+  gem.add_dependency 'activesupport', '>= 2.3' #, :require => 'active_support'
+  gem.add_dependency 'rails', '>= 2.3' #, :require => 'active_support'
   gem.add_dependency 'json'
   gem.add_development_dependency 'bundler'
   gem.add_development_dependency 'rake'
