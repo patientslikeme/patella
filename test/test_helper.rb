@@ -11,13 +11,14 @@ module Rails
   end
 end
 
+require 'active_support/core_ext'
+
 Bundler.require
 require 'patella'
 require 'test/unit'
-require 'active_support'
 require 'active_support/test_case'
 require 'json'
 require 'mocha'
 require 'bourne'
-
+require 'pry'
 

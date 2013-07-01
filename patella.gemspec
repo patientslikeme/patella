@@ -1,26 +1,29 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path('../lib/patella/version', __FILE__)
 
-Gem::Specification.new do |gem|
-  gem.authors       = ["Jeff Dwyer"]
-  gem.email         = ["jdwyer@patientslikeme.com"]
-  gem.description   = "It's Memoization into Memcached calculated in the background with Resque."
-  gem.summary       = "DSL to add memoization on any method into Memcached calculated in the background with Resque."
-  gem.homepage      = "https://github.com/patientslikeme/patella"
+Gem::Specification.new do |s|
+  s.name = "patella"
+  s.version = "0.1.0"
 
-  gem.files         = `git ls-files`.split($\)
-  gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
-  gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
-  gem.name          = "patella"
-  gem.require_paths = ["lib"]
-  gem.version       = Patella::VERSION
-  gem.add_dependency 'resque', '~>1.16'
-  gem.add_dependency 'resque-meta', '~>1.0.0'
-  gem.add_dependency 'activesupport', '>= 2.3' #, :require => 'active_support'
-  gem.add_dependency 'rails', '>= 2.3' #, :require => 'active_support'
-  gem.add_dependency 'json'
-  gem.add_development_dependency 'bundler'
-  gem.add_development_dependency 'rake'
-  gem.add_development_dependency 'mocha', "~>0.9.8"
-  gem.add_development_dependency 'bourne'
+  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
+  s.authors = ["Jeff Dwyer"]
+  s.date = "2013-06-28"
+  s.description = "It's Memoization into Memcached calculated in the background with Resque."
+  s.email = ["jdwyer@patientslikeme.com"]
+  s.files = [".gitignore", "Gemfile", "LICENSE", "README.md", "Rakefile", "config/tddium.yml", "lib/patella.rb", "lib/patella/controllers/actions.rb", "lib/patella/helpers/patella_partial.rb", "lib/patella/patella.rb", "lib/patella/send_later.rb", "lib/patella/send_later_worker.rb", "lib/patella/version.rb", "patella.gemspec", "test/patella_test.rb", "test/test_helper.rb"]
+  s.homepage = "https://github.com/patientslikeme/patella"
+  s.require_paths = ["lib"]
+  s.rubygems_version = "1.8.23"
+  s.summary = "DSL to add memoization on any method into Memcached calculated in the background with Resque."
+  s.test_files = ["test/patella_test.rb", "test/test_helper.rb"]
+
+  s.add_runtime_dependency(%q<resque>, ["~> 1.16"])
+  s.add_runtime_dependency(%q<resque-meta>, ["~> 1.0.0"])
+  s.add_runtime_dependency(%q<activesupport>, [">= 2.3"])
+  s.add_runtime_dependency(%q<rails>, [">= 2.3"])
+  s.add_runtime_dependency(%q<json>, [">= 0"])
+  s.add_development_dependency(%q<bundler>, [">= 0"])
+  s.add_development_dependency(%q<rake>, [">= 0"])
+  s.add_development_dependency(%q<mocha>, ["~> 0.9.8"])
+  s.add_development_dependency(%q<bourne>, [">= 0"])
+  s.add_development_dependency("pry")
 end
