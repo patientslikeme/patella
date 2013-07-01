@@ -2,16 +2,8 @@ require 'rubygems'
 require 'bundler/setup'
 
 module Rails
-  class MockCache
-    def fetch(*args)
-      yield
-    end
-    def write(*args)
-    end
-  end
-
   def self.cache
-    @cache ||= MockCache.new
+    @cache ||= ActiveSupport::Cache::MemoryStore.new
   end
 
   def self.env

@@ -27,6 +27,11 @@ class Dummy
     self.id + add
   end
   patella_reflex :baz
+  
+  def fail
+    raise "FAILURE"
+  end
+  patella_reflex :fail
 
   def self.bing
     3
@@ -57,6 +62,18 @@ class PatellaTest < ActiveSupport::TestCase
         ex.once
         ex.with 'Dummy', f1.id, :caching_foo, []
       end
+    end
+  end
+  
+  def test_failing_work
+    f1 = Dummy.new 5
+    assert_nil Rails.cache.read(f1.patella_key :fail, [])
+    assert_raises(RuntimeError) { f1.fail }
+    assert JSON.parse(Rails.cache.read(f1.patella_key :fail, []))["failed"]
+    
+    # have to do this here because without send_later enabled, patella_fail will always end up calling fail (because :force => true)
+    sending_later do
+      assert f1.fail.failed?
     end
   end
 

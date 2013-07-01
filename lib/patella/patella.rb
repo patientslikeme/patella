@@ -46,10 +46,16 @@ module Patella::Patella
 
         def caching_#{symbol}(args)
           cache_key = self.patella_key('#{symbol}',args)
-          result = args.any? ? #{original_method}(*args) : #{original_method}()
-          json = {'result' => result, 'soft_expiration' => Time.now + #{options[:expires_in]} - #{ options[:soft_expiration]}}.to_json
-          Rails.cache.write(cache_key, json, :expires_in => #{options[:expires_in]})
-          result
+          begin
+            result = args.any? ? #{original_method}(*args) : #{original_method}()
+            json = {'result' => result, 'soft_expiration' => Time.now + #{options[:expires_in]} - #{ options[:soft_expiration]}}.to_json
+            Rails.cache.write(cache_key, json, :expires_in => #{options[:expires_in]})
+            result
+          rescue Exception => e
+            json = {'failed' => true, 'soft_expiration' => Time.now + #{options[:expires_in]} - #{options[:soft_expiration]}}.to_json
+            Rails.cache.write(cache_key, json, :expires_in => #{options[:expires_in]})
+            raise e
+          end
         end
 
         def clear_#{symbol}(*args)
@@ -83,7 +89,10 @@ module Patella::Patella
           end
 
           val = JSON.parse(json)
-          if val and !val['promise']
+          if val && val['failed']
+            failed = true
+            loading = false
+          elsif val && !val['promise']
             loading = false
             soft_expiration = Time.parse(val['soft_expiration']) rescue nil
             json_val = val
@@ -93,14 +102,14 @@ module Patella::Patella
             loading = true
           end
 
-          if !loading and soft_expiration and Time.now > soft_expiration
+          if !loading && !failed && soft_expiration && Time.now > soft_expiration
             expires = #{options[:soft_expiration]} + 10*60
             json_val['soft_expiration'] = (Time.now - expires).to_s
             Rails.cache.write(cache_key, json_val, :expires_in => expires)
             self.send_later(:caching_#{symbol}, args)
           end
 
-          PatellaResult.new val, loading, cache_key
+          PatellaResult.new val, loading, failed, cache_key
         end
 
         if private_method_defined?(#{original_method.inspect})                   # if private_method_defined?(:_unmemoized_mime_type)
@@ -121,9 +130,10 @@ end
 
 class PatellaResult < ActiveSupport::BasicObject
   attr_reader :cache_key
-  def initialize(target=nil, loading=false, cache_key)
+  def initialize(target=nil, loading=false, failed=false, cache_key)
     @target = target
     @loading = loading
+    @failed = failed
     @cache_key = cache_key
   end
 
@@ -133,6 +143,10 @@ class PatellaResult < ActiveSupport::BasicObject
 
   def loaded?
     !@loading
+  end
+  
+  def failed?
+    @failed
   end
 
   def method_missing(method, *args, &block)
