@@ -1,7 +1,15 @@
 # Patella
 
-Gem for the RailsConf 2012 talk Patella: It's Memoization into Memcached calculated in the background with Resque.
-[www.slideshare.net/jdwyah/patella-railsconf-2012](http://www.slideshare.net/jdwyah/patella-railsconf-2012)
+Patella is a robust implementation of send_later for Rails applications using Resque.  It supports:
+
+* Sending to specific queues on a per-call basis
+* A global on/off switch for send_later
+* Sensible defaults for the default Rails environments (send_later is disabled in development and test)
+
+# What happened to memoization into memcached etc?
+
+Patella was originally a gem for memoizing expensive method calls in Rails apps in the background and loading them
+asynchronously.  Jeff Dwyer did a RailsConf 2012 talk about it: [www.slideshare.net/jdwyah/patella-railsconf-2012](http://www.slideshare.net/jdwyah/patella-railsconf-2012)
 
 ## Installation
 
@@ -20,42 +28,22 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-  def self.my_slow_method(user_id)
-    all_notifications_for(User.find(user_id))
-  end
-  patella_reflex :my_slow_method, :expires_in => 3.minutes, :class_method => true
+post = Post.find(params[:id])
+post.send_later(:slow_calculation)
+post.send_later(:slow_calculation_with_two_parameters, 5, "jdwyah!")
+post.send_later_on_queue(:hashing, :hash_content, 8675309)
+
+Post.send_later(:class_method)
+Post.send_later_on_queue(:high_priority, :class_method_with_a_parameter, 50)
 ```
 
-See the tests for more [examples](https://github.com/kbrock/patella/blob/master/test/patella_test.rb)
+`Patella::SendLater` is the module that provides the `send_later` and `send_later_on_queue` methods.  It's included by default
+in all `ActiveRecord::Base` subclasses, but you can include it in any class that implements the `#id` and `.find` methods.
 
-Inlcude the partial:
+By default, `send_later` will enqueue jobs on a queue called "send_later".  You can alter this default:
+
 ```ruby
-  module ApplicationHelper
-    include Patella::PatellaPartial
-  end
-```
-
-Add a controller:
-```ruby
-  class PatellaController < ApplicationController
-    include Patella::Actions
-    helper :some_app_helper_i_need
-end
-```
-
-Then in your view:
-
-```haml
-= patella_partial @some_patella_obj, 'path/to/my/partial', :extra_things => :to_render_partial
-```
-
-And in the partial:
-
-```haml
-
-- your_patella_result = patella_obj
-- lookup = User.find(extra_things)
-
+Patella::SendLaterWorker.default_queue = :my_custom_queue
 ```
 
 ## Contributing
