@@ -65,6 +65,24 @@ class PatellaTest < ActiveSupport::TestCase
     assert job = Resque.peek(:object_finding)
     assert_equal ["Dummy", nil, "find", 6], job["args"]
   end
+  
+  def test_changing_default_queue
+    default_queue = Patella::SendLaterWorker.default_queue
+    begin
+      Patella::SendLaterWorker.default_queue = :new_default
+      
+      sending_later do
+        @dummy.send_later(:id)
+        Dummy.send_later(:find, 6)
+      end
+      
+      job1, job2 = Resque.pop(:new_default), Resque.pop(:new_default)
+      assert_equal ["Dummy", 5, "id"], job1["args"]
+      assert_equal ["Dummy", nil, "find", 6], job2["args"]
+    ensure
+      Patella::SendLaterWorker.default_queue = default_queue
+    end
+  end
 
 private
   def sending_later(&block)
