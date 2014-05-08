@@ -4,23 +4,20 @@ require 'resque/plugins/meta'
 module Patella
   class SendLaterWorker
     extend ::Resque::Plugins::Meta
-    @@default_queue = :send_later
-    cattr_accessor :queues
-    @@queues = {}
+    cattr_accessor :default_queue
+    self.default_queue = :send_later
 
-    def self.perform_later(*args)
-      # args[0] is class name of invoking class, args[2] is method
-      queue = self.queue_for(args[0], args[2])
-      Resque::Job.create(queue, 'Patella::SendLaterWorker', *args)
+    def self.perform_later(class_name, instance_id, method_name, *args)
+      perform_later_on_queue default_queue, class_name, instance_id, method_name, *args
     end
-
-    def self.queue_for(class_name, method_name)
-      @@queues[class_name.to_s].try(:[],method_name.to_s) || @@default_queue
+    
+    def self.perform_later_on_queue(queue, class_name, instance_id, method_name, *args)
+      Resque::Job.create(queue, 'Patella::SendLaterWorker', class_name, instance_id, method_name, *args)      
     end
 
     def self.perform(class_name, instance_id, method_name, *args)
       o = class_name.constantize
-      o = o.find_by_id instance_id if instance_id
+      o = o.find(instance_id) if instance_id
 
       o.send(method_name, *args)
     rescue => e
