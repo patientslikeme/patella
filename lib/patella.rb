@@ -4,7 +4,8 @@ require "patella/send_later_worker"
 require "active_record"
 
 module Patella
-  ::Patella::SendLater.send_now = case ::Rails.env.try(:to_s)
+  rails_env = (defined?(Rails) && Rails.env)  
+  ::Patella::SendLater.send_now = case rails_env
   when 'development', 'test'
     true
   else
